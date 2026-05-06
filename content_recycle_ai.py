@@ -13,7 +13,7 @@ if not api_key:
     st.error("Lipsește cheia API! Pune GEMINI_API_KEY în Streamlit Secrets.")
 else:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('models/gemini-1.5-flash')
 
     text_input = st.text_area("Introdu transcriptul sau textul lung aici:", height=200)
 
