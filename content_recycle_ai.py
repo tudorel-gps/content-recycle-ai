@@ -2,38 +2,34 @@ import streamlit as st
 import google.generativeai as genai
 
 st.set_page_config(page_title="ContentRecycle AI", layout="centered")
-st.title("♻️ ContentRecycle AI")
 
+# --- LOGICA DE ACCES ---
+PAROLA_CORECTA = st.secrets.get("APP_PASSWORD") # O setezi în Secrets
+
+if "access_granted" not in st.session_state:
+    st.session_state["access_granted"] = False
+
+if not st.session_state["access_granted"]:
+    st.title("🔐 Acces Restricționat")
+    st.write("Introdu parola pentru a folosi generatorul de postări.")
+    
+    parola_introdusa = st.text_input("Parola:", type="password")
+    if st.button("Deblochează"):
+        if parola_introdusa == PAROLA_CORECTA:
+            st.session_state["access_granted"] = True
+            st.rerun()
+        else:
+            st.error("Parolă incorectă!")
+            st.write("[Click aici pentru a cumpăra acces](LINK-UL-TAU-DE-PLATA)")
+    st.stop() # Oprește restul aplicației aici
+
+# --- CODUL APLICATIEI (Se vede doar după logare) ---
+st.title("♻️ ContentRecycle AI - Panou Control")
+# Aici vine restul codului tău cu Gemini pe care îl aveam deja...
 api_key = st.secrets.get("GEMINI_API_KEY")
+genai.configure(api_key=api_key)
 
-if not api_key:
-    st.error("Lipsește cheia API în Secrets!")
-else:
-    genai.configure(api_key=api_key)
-    
-    # Găsim automat un model valid care suportă generarea de text
-    available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-    
-    if not available_models:
-        st.error("Nu am găsit niciun model disponibil pentru această cheie API.")
-    else:
-        # Alegem primul model disponibil (de obicei gemini-1.5-flash sau gemini-pro)
-        target_model = available_models[0]
-        model = genai.GenerativeModel(target_model)
-        
-        st.info(f"Model activat cu succes: {target_model}")
-
-        text_input = st.text_area("Introdu textul pentru reciclare:", height=200)
-
-        if st.button("Generează Postări"):
-            if text_input:
-                with st.spinner('AI-ul lucrează...'):
-                    try:
-                        prompt = f"Transformă acest text în 3 postări de social media (LinkedIn, X, Instagram): {text_input}"
-                        response = model.generate_content(prompt)
-                        st.divider()
-                        st.markdown(response.text)
-                    except Exception as e:
-                        st.error(f"Eroare la generare: {e}")
-            else:
-                st.warning("Introdu un text mai întâi!")
+# ... (restul funcționalității tale)
+st.success("Ești logat! Spor la generat bani.")
+text_input = st.text_area("Introdu textul:", height=200)
+# etc.
