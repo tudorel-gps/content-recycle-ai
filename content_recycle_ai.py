@@ -41,7 +41,7 @@ else:
     genai.configure(api_key=api_key)
     
     # Folosim varianta flash care e cea mai rapida
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-pro')
 
     source_text = st.text_area("Paste your source content here:", height=250, placeholder="E.g., A YouTube transcript...")
 
