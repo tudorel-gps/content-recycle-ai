@@ -42,7 +42,7 @@ if not api_key:
     st.error("API Key missing. Check Streamlit Secrets.")
 else:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     source_text = st.text_area("Paste your source content here:", height=250, placeholder="E.g., A YouTube transcript, a blog post, or a long thought...")
     
