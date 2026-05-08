@@ -1,55 +1,56 @@
 import streamlit as st
 import requests
 
-# Configurare Pagina
+# Setări de bază
 st.set_page_config(page_title="ContentRecycle AI", page_icon="♻️")
 
-# Secrete
+# Preluăm secretele
 api_key = st.secrets.get("GEMINI_API_KEY")
 password = st.secrets.get("APP_PASSWORD")
 
-# Login simplu
+# Logare simplă
 if "auth" not in st.session_state:
     st.session_state.auth = False
 
 if not st.session_state.auth:
-    input_pass = st.text_input("Parola:", type="password")
-    if st.button("Log In"):
+    st.title("♻️ ContentRecycle AI")
+    input_pass = st.text_input("Introdu parola de acces:", type="password")
+    if st.button("Intră în aplicație"):
         if input_pass == password:
             st.session_state.auth = True
             st.rerun()
+        else:
+            st.error("Parolă greșită!")
     st.stop()
 
-st.title("♻️ ContentRecycle AI")
-source_text = st.text_area("Pune textul aici:", height=200)
+# Aplicația principală
+st.title("♻️ ContentRecycle AI - Dashboard")
+source_text = st.text_area("Lipește textul tău aici:", height=200)
 
-if st.button("Generate"):
+if st.button("Generează Postări"):
     if not source_text:
-        st.warning("Pune text!")
+        st.warning("Pune un text mai întâi!")
     else:
-        # APEL DIRECT HTTP - Ignoram libraria oficiala care da erori
-        # Folosim versiunea v1 (nu beta) si modelul cel mai stabil
-        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={api_key}"
+        # ATENȚIE: Folosim URL-ul direct pentru Gemini 1.5 Flash
+        # Am pus v1 (nu v1beta) pentru stabilitate maximă
+        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
         
-        headers = {'Content-Type': 'application/json'}
         payload = {
             "contents": [{
-                "parts": [{"text": f"Transforma in 3 postari social media: {source_text}"}]
+                "parts": [{"text": f"Transformă acest text în 3 postări de social media (LinkedIn, X, Instagram): {source_text}"}]
             }]
         }
         
-        with st.spinner("Se genereaza..."):
-            response = requests.post(url, json=payload, headers=headers)
+        with st.spinner("Se lucrează..."):
+            res = requests.post(url, json=payload)
             
-            if response.status_code == 200:
-                result = response.json()
-                # Extragem textul din raspunsul JSON
+            if res.status_code == 200:
                 try:
-                    generated_text = result['candidates'][0]['content']['parts'][0]['text']
+                    output = res.json()['candidates'][0]['content']['parts'][0]['text']
                     st.success("Gata!")
-                    st.markdown(generated_text)
-                except:
-                    st.error("Google a raspuns dar formatul e ciudat. Verifica cheia API.")
+                    st.markdown(output)
+                except Exception:
+                    st.error("Eroare la procesarea răspunsului de la Google.")
             else:
-                st.error(f"Eroare Google: {response.status_code}")
-                st.json(response.json()) # Vedem exact de ce urla Google
+                st.error(f"Eroare Google: {res.status_code}")
+                st.json(res.json()) # Aici o să vedem exact ce nu-i convine
