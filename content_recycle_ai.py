@@ -26,7 +26,7 @@ if not st.session_state["authenticated"]:
         else:
             st.error("Invalid password!")
             # REPLACE THE LINK BELOW WITH YOUR GUMROAD LINK
-            st.markdown(f"### [Don't have a password? Get instant access for $2 here](YOUR_GUMROAD_LINK_HERE)")
+            st.markdown(f"### [Don't have a password? Get it for $2 here](https://farcastor.gumroad.com/l/xumhyx)")
     
     st.write("---")
     st.caption("Powered by Google Gemini AI")
