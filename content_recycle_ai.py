@@ -1,55 +1,55 @@
 import streamlit as st
 import requests
 
-# --- CONFIGURARE PAGINĂ ---
+# --- PAGE CONFIG ---
 st.set_page_config(page_title="ContentRecycle AI", layout="centered", page_icon="♻️")
 
-# --- DATE ACCES (DIN SECRETS SAU COD) ---
-# Am lăsat cheia ta de Groq aici pentru a fi sigur că merge direct
+# --- DATA ACCESS ---
+# Using your Groq API Key
 GROQ_API_KEY = "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"
 ACCESS_PASSWORD = st.secrets.get("APP_PASSWORD")
 
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
 
-# --- ECRAN DE LOGIN ---
+# --- LOGIN SCREEN ---
 if not st.session_state["authenticated"]:
     st.title("♻️ ContentRecycle AI")
-    st.subheader("Transformă orice text în postări virale.")
+    st.subheader("Transform any content into viral social media posts.")
     st.write("---")
     
-    pwd = st.text_input("Parola de acces:", type="password")
-    if st.button("Deblochează"):
+    pwd = st.text_input("Access Password:", type="password")
+    if st.button("Unlock Access"):
         if pwd == ACCESS_PASSWORD:
             st.session_state["authenticated"] = True
             st.rerun()
         else:
-            st.error("Parolă incorectă!")
-            st.markdown("### [Cumpără acces aici](https://farcastor.gumroad.com/l/xumhyx)")
+            st.error("Invalid Password!")
+            st.markdown("### [Get access here](https://farcastor.gumroad.com/l/xumhyx)")
     st.stop()
 
-# --- DASHBOARD PRINCIPAL ---
+# --- MAIN DASHBOARD ---
 st.title("♻️ ContentRecycle AI - Dashboard")
-st.write("Lipește textul mai jos și lasă AI-ul să facă magia.")
+st.write("Paste your content below and let the AI do the magic.")
 
-source_text = st.text_area("Text sursă:", height=200, placeholder="Ex: Un transcript de YouTube, un articol...")
+source_text = st.text_area("Source Content:", height=200, placeholder="E.g., YouTube transcript, blog article, or raw notes...")
 
-if st.button("Generează Postări"):
+if st.button("Generate Posts"):
     if source_text:
-        with st.spinner("Groq generează postările..."):
+        with st.spinner("AI is crafting your posts..."):
             url = "https://api.groq.com/openai/v1/chat/completions"
             headers = {
                 "Authorization": f"Bearer {GROQ_API_KEY}",
                 "Content-Type": "application/json"
             }
             
-            # NOUL PROMPT AGRESIV: Nu pune întrebări, doar execută.
+            # THE PROMPT (English instructions)
             data = {
                 "model": "llama-3.3-70b-versatile",
                 "messages": [
                     {
                         "role": "system", 
-                        "content": "You are a professional social media content generator. Your task: take ANY input and transform it into 3 viral posts (LinkedIn, X, Instagram). Do NOT ask for more info. Do NOT explain yourself. Just output the posts. Even if the input is short or weird, create something viral out of it."
+                        "content": "You are a professional social media content generator. Your task: take ANY input and transform it into 3 viral posts (LinkedIn, X, and Instagram). Do NOT ask for more info. Do NOT explain yourself. Just output the posts in English. Even if the input is short, weird, or in another language, create high-quality viral posts in English based on it."
                     },
                     {"role": "user", "content": source_text}
                 ],
@@ -62,14 +62,14 @@ if st.button("Generează Postări"):
                     result = response.json()
                     st.divider()
                     st.markdown(result['choices'][0]['message']['content'])
-                    st.success("Gata! Generat cu succes.")
+                    st.success("Success! Posts generated.")
                 else:
-                    st.error(f"Eroare Groq: {response.status_code}")
+                    st.error(f"Groq Error: {response.status_code}")
                     st.json(response.json())
             except Exception as e:
-                st.error(f"A apărut o eroare: {e}")
+                st.error(f"An error occurred: {e}")
     else:
-        st.warning("Te rog să introduci un text!")
+        st.warning("Please provide some text first!")
 
 st.write("---")
 if st.button("Logout"):
